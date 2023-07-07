@@ -2,19 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 const user = require('./user.routes');
-const job = require('./job.routes');
-const workTime = require('./workTimes.routes');
+const project = require('./project.routes');
+const material = require('./material.routes');
 const email = require('./email.routes');
-const jobPictures = require('./jobPicture.routes');
+const issue = require('./issue.routes');
+const sprint = require('./sprint.routes');
 
-router.use('/profile', express.static('./profiles'));
-router.use('/pictures', express.static('./pictures'));
+router.use('/files', express.static('./files'));
+router.use('/materials', express.static('./materials'));
 
 router.use('/email', email);
 router.use('/user', user);
-router.use('/job', job);
-router.use('/workTime', workTime);
-router.use('/email', email);
-router.use('/jobPictures', jobPictures);
+router.use('/project', project);
+router.use('/material', material);
+router.use('/issue', issue);
+router.use('/sprint', sprint);
 
 module.exports = router;

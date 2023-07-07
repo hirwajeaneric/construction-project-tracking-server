@@ -6,7 +6,6 @@ const passwordComplexity = require('joi-password-complexity');
 const sendEmail = require('../utils/email/sendEmail');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, UnauthenticatedError } = require('../errors');
-const multer = require('multer');
 
 const signIn = async (req, res) => {
     const { email, password } = req.body;
@@ -33,14 +32,9 @@ const signIn = async (req, res) => {
             fullName: user.fullName,
             alias: user.alias,
             phone: user.phone,
-            userType: user.userType,
-            companyName: user.companyName,
-            specialities: user.specialities,
-            jobHistory: user.jobHistory,
-            profilePicture: user.profilePicture,
-            ratings: user.ratings,
-            description: user.description,
-            token: token,
+            role: user.role,
+            company: user.company,
+            token
         }
     })
 };
@@ -69,14 +63,9 @@ const signUp = async (req, res) => {
             fullName: user.fullName,
             alias: user.alias,
             phone: user.phone,
-            userType: user.userType,
-            companyName: user.companyName,
-            specialities: user.specialities,
-            jobHistory: user.jobHistory,
-            profilePicture: user.profilePicture,
-            ratings: user.ratings,
-            description: user.description,
-            token: token,
+            role: user.role,
+            company: user.company,
+            token
         }
     })
 
@@ -110,45 +99,16 @@ const findByEmail = async(req, res, next) => {
 };
 
 const findByUserType = async(req, res, next) => {
-    const userType = req.query.userType;
-    const users = await User.findOne({ userType: userType })
+    const role = req.query.role;
+    const users = await User.findOne({ role: role })
     
     if (!users || users.length === 0 ) {
-        throw new NotFoundError(`No user with type ${userType}`);
+        throw new NotFoundError(`No user with type ${role}`);
     }
     
     res.status(200).json({ users });
 };
 
-// Establishing a multer storage
-const multerStorage = multer.diskStorage({
-    destination: (req, file, callback) => { callback(null, './profiles') },
-    filename: (req, file, callback) => { callback(null, `user-${file.originalname}`) }
-})
-
-// Filter files with multer
-const multerFilter = (req, file, callback) => {
-    if (file.mimetype.startsWith("image")) {
-        callback(null, true);
-    } else {
-        callback("Not an image! Please upload only images.", false);
-    }
-  };
-
-const upload = multer({ 
-    storage: multerStorage,
-    fileFilter: multerFilter 
-});
-
-// Middleware for attaching files to the request body before saving.
-const attachFile = (req, res, next) => {
-    if (req.file) {
-        req.body.profilePicture = req.file.filename;
-        next();
-    } else {
-        next();
-    }
-}
 
 const updateUser = async(req, res, next) => {
     const user = await User.findByIdAndUpdate({ _id: req.query.id }, req.body);
@@ -163,14 +123,9 @@ const updateUser = async(req, res, next) => {
             fullName: updatedUser.fullName,
             alias: updatedUser.alias,
             phone: updatedUser.phone,
-            userType: updatedUser.userType,
-            companyName: updatedUser.companyName,
-            specialities: updatedUser.specialities,
-            jobHistory: updatedUser.jobHistory,
-            profilePicture: updatedUser.profilePicture,
-            ratings: updatedUser.ratings,
-            description: updatedUser.description,
-            token: token,
+            role: updatedUser.role,
+            company: updatedUser.company,
+            token
         }
     })
 };
@@ -239,4 +194,4 @@ const deleteAccount = async(req, res, next) => {
     res.status(StatusCodes.OK).json({ message: "Account deleted!" });
 };
 
-module.exports = { signIn, signUp, requestPasswordReset, findByEmail, findByUserType, resetPassword, getUsers, findById, updateUser, upload, deleteAccount, attachFile }
+module.exports = { signIn, signUp, requestPasswordReset, findByEmail, findByUserType, resetPassword, getUsers, findById, updateUser, deleteAccount }

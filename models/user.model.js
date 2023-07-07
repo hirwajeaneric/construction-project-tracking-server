@@ -13,16 +13,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false, 
         enum: {
-            values: ["Personal","Company","DJ","Manager","Admin"],
-            message: '{VALUE} is not supported as a user type.'
+            values: ["Consultant","Owner","Stakeholder"],
+            message: '{VALUE} is not supported as a user role.'
         }
     },
-    companyName: { 
-        type: String, 
-        trim: true, 
-        required: false,
-    },
-    companyDescription: { 
+    company: { 
         type: String, 
         trim: true, 
         required: false,
@@ -42,39 +37,10 @@ const userSchema = new mongoose.Schema({
         maxlength: 12,
         minlength: 10,
     },
-    specialities: {
-        type: String,
-        required: false,
-    },
-    jobHistory: {
-        type: Array,
-        required: false,
-    },
     password: { 
         type: String, 
         required: [true, 'Password must be provided'], 
         minlength: 8, 
-    },
-    description: { 
-        type: String, 
-        required: false, 
-    },
-    profilePicture: { 
-        type: String, 
-        required: false, 
-    },
-    ratings: { 
-        type: Number, 
-        required: true,
-        default: 0, 
-    },
-    status: {
-	type: String,
-	required: false,
-	enum: {
-	    values: ["Active", "Inactive"],
-	    message: '{VALUE} is not supported as a user status'
-	}
     }
 }) 
 
@@ -82,10 +48,6 @@ userSchema.pre('save', async function() {
     if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-
-    if (!this.userType === 'DJ') {
-	this.status = 'Active';
-    }
 });
 
 userSchema.methods.createJWT = function() {
