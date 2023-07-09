@@ -34,6 +34,12 @@ const issueSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    materials: [
+        {
+            materialId: { type: String },
+            quantity: { type: Number }      
+        }
+    ],
     progress: {
         type: String, 
         required: true,

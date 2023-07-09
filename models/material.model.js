@@ -33,6 +33,11 @@ const materialSchema = new mongoose.Schema({
     project: { 
         type: String, 
         required: true 
+    },
+    entryDate: { 
+        type: Date, 
+        required: true,
+        default: Date.now() 
     }
 }) 
 
