@@ -139,9 +139,9 @@ const requestPasswordReset = async(req, res, next) => {
   
     let token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: 1800 }); 
     
-    let clientDomain = 'localhost';
+    let clientDomain = '192.168.43.115';
 
-    let link = `http://${clientDomain || localhost}:5555/reset-password/${token}/${registeredUser._id}`;
+    let link = `http://${clientDomain || localhost}:5000/reset-password/${token}/${registeredUser._id}`;
 
     await sendEmail(
         registeredUser.email,
