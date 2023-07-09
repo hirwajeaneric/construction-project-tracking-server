@@ -139,9 +139,9 @@ const requestPasswordReset = async(req, res, next) => {
   
     let token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: 1800 }); 
     
-    let clientDomain = '192.168.43.115';
+    let clientDomain = '';
 
-    let link = `http://${clientDomain || localhost}:5000/reset-password/${token}/${registeredUser._id}`;
+    let link = `http://${clientDomain || 'localhost'}:5000/auth/reset-password/${token}/${registeredUser._id}`;
 
     await sendEmail(
         registeredUser.email,
@@ -175,7 +175,7 @@ const resetPassword = async(req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const updatedUser = await User.findOneAndUpdate( req.query.id, { password: hashedPassword });    
+    const updatedUser = await User.findOneAndUpdate({_id: req.query.id}, { password: hashedPassword });    
 
     if (!updatedUser) {
         throw new UnauthenticatedError('Unable to change password');
