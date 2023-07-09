@@ -2,9 +2,31 @@ const ProjectModel = require('../models/project.model');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors/index');
 
+const generateProjectCode = (req, res, next) => {
+    function processString(name) {
+        const today = new Date().toLocaleDateString('en-US', {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit'
+        }).replace(/\//g, '');
+      
+        const nameParts = name.split(' ');
+      
+        if (nameParts.length === 1) {
+          return nameParts[0].slice(0, 4).toUpperCase() + today;
+        } else {
+          const initials = nameParts.map(part => part[0].toUpperCase()).join('');
+          return initials.slice(0, 3) + today;
+        }
+    }
+    
+    req.body.code = processString(req.body.name);
+    next();
+}
+
 const add = async (req, res) => {
     const project = await ProjectModel.create(req.body);
-    res.status(StatusCodes.CREATED).json({ message: 'Booking Created', project })
+    res.status(StatusCodes.CREATED).json({ message: 'New project created', project })
 };
 
 const getAll = async(req, res) => {
@@ -24,6 +46,15 @@ const findByName = async(req, res) => {
 const findById = async(req, res) => {
     const projectId = req.query.id;
     const project = await ProjectModel.findById(projectId);
+    if (!project) {
+        throw new BadRequestError(`Project not found!`);
+    }
+    res.status(StatusCodes.OK).json({ project });
+};
+
+const findByCode = async(req, res) => {
+    const projectCode = req.query.code;
+    const project = await ProjectModel.findOne({code: projectCode});
     if (!project) {
         throw new BadRequestError(`Project not found!`);
     }
@@ -51,4 +82,4 @@ const edit = async(req, res) => {
     res.status(StatusCodes.OK).json({ message: 'Project updated', updatedProject })
 };
 
-module.exports = { add, getAll, edit, findById, findByName, remove };
+module.exports = { findByCode, generateProjectCode, add, getAll, edit, findById, findByName, remove };

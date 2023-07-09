@@ -9,6 +9,10 @@ const projectSchema = new mongoose.Schema({
         type: String, 
         required: [true, 'Project name must be provided'] 
     },
+    code: {
+        type: String,
+        required: false,
+    },
     creationDate: { 
         type: Date, 
         required: true,
@@ -106,6 +110,11 @@ const projectSchema = new mongoose.Schema({
     consultantEmail: { 
         type: String, 
         required: true 
+    },
+    progress: { 
+        type: Number, 
+        required: true,
+        default: 0, 
     },
     status: { 
         type: String, 
