@@ -31,14 +31,14 @@ const attachFile = async (req, res, next) => {
 }
 
 const add = async (req, res) => {
-    console.log(req.body);
+    req.body.totalPrice = req.body.quantity * req.body.unitPrice;
     const material = await MaterialModel.create(req.body);
     res.status(StatusCodes.CREATED).json({ message: 'Added', material })
 };
 
 const getAll = async(req, res) => {
     const materials = await MaterialModel.find({})
-    res.status(StatusCodes.OK).json({ nbHits:  materials.length,  materials })
+    res.status(StatusCodes.OK).json({ nbHits:  materials.length, materials })
 };
 
 const findById = async(req, res) => {
@@ -58,9 +58,9 @@ const findByProjectId = async(req, res) => {
 
 const edit = async(req, res) => {
     const material = req.body;
-    const { materialId } = req.query;
+    const { id } = req.query;
     
-    const updated = await MaterialModel.findByIdAndUpdate({ _id: materialId }, material);
+    const updated = await MaterialModel.findByIdAndUpdate({ _id: id }, material);
     const updatedMaterial = await MaterialModel.findById(updated._id);
 
     res.status(StatusCodes.OK).json({ message: 'Updated', material: updatedMaterial })

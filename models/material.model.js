@@ -21,14 +21,26 @@ const materialSchema = new mongoose.Schema({
         type: Number, 
         required: true, 
     },
+    measurementUnit: { 
+        type: String, 
+        required: true,
+        enum: {
+            values: ["Piece(s)", "Tone(s)", "Bag(s)","Truck(s)"],
+            message: '{VALUE} is not supported as a measurement unit' 
+        }
+    },
     unitPrice: { 
         type: Number,
         required: true,
         defaut: 0 
     },
+    currency: {
+        type: String,
+        required: true,
+    },
     totalPrice: { 
         type: Number, 
-        required: true 
+        required: false 
     },
     project: { 
         type: String, 
@@ -40,5 +52,9 @@ const materialSchema = new mongoose.Schema({
         default: Date.now() 
     }
 }) 
+
+// materialSchema.pre('save', async function() {
+//     this.totalPrice = this.quantity * this.unitPrice;
+// })
 
 module.exports = mongoose.model('material', materialSchema);
