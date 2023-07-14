@@ -5,9 +5,13 @@ const commentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    message: {
+        type: String,
+        required: true,
+    },
     senderId: {
         type: String,
-        required: false,
+        required: true,
     },
     issue: {
         type: String,
@@ -17,7 +21,7 @@ const commentSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    date: {
+    addDate: {
         type: Date,
         required: true,
         default: Date.now()

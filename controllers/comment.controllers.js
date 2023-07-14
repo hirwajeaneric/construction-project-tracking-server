@@ -44,7 +44,17 @@ const remove = async(req, res) => {
         throw new NotFoundError(`Comment with id ${commentId} not found!`);
     }
 
-    res.status(StatusCodes.OK).json({ message: 'comment deleted'})
+    res.status(StatusCodes.OK).json({ message: 'Comment deleted'})
+};
+
+const deleteByIssue = async (req, res) => {
+    const deleted = await CommentModel.deleteMany({ issue : req.query.issue });
+    res.status(StatusCodes.OK).json({ message: 'Comments deleted'})
+};
+
+const deleteBySprint = async (req, res) => {
+    const deleted = await CommentModel.deleteMany({ sprint : req.query.sprint });
+    res.status(StatusCodes.OK).json({ message: 'Comments deleted'})
 };
 
 const edit = async(req, res) => {
@@ -60,4 +70,4 @@ const edit = async(req, res) => {
     res.status(StatusCodes.OK).json({ message: 'Updated', comment: updatedcomment})
 };
 
-module.exports = { add, getAll, edit, findByIssueId, findBySprintId, findByPreviousComment, findById, remove }
+module.exports = { add, getAll, edit, findByIssueId, findBySprintId, findByPreviousComment, findById, remove, deleteByIssue, deleteBySprint }
