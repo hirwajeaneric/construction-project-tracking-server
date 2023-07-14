@@ -46,7 +46,8 @@ const issueSchema = new mongoose.Schema({
         enum: {
             values: ["Todo", "In Progress", "Completed"],
             message: '{VALUE} is not supported as a project type.'
-        }
+        },
+        default: "Todo"
     }
 }); 
 
