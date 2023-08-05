@@ -60,6 +60,10 @@ const sprintSchema = new mongoose.Schema({
             quantity: {
                 type: Number,
                 required: false,
+            },
+            used: {
+                type: Number,
+                required: false,
             }
         }
     ]
