@@ -1,11 +1,16 @@
 const SprintModel = require('../models/sprint.model');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors/index');
+const asyncWrapper = require('../middleware/async');
 
-const add = async (req, res) => {
+const add = asyncWrapper(async (req, res) => {
+    const existingSprints = await SprintModel.find({});
+    var numberOfNextSprint = existingSprints.length + 1;
+    req.body.number = numberOfNextSprint;
+
     const sprint = await SprintModel.create(req.body);
     res.status(StatusCodes.CREATED).json({ message: 'Added', sprint })
-};
+});
 
 const getAll = async(req, res) => {
     const sprints = await SprintModel.find({});
@@ -29,7 +34,7 @@ const findByProjectId = async(req, res) => {
 
 const findByIssueId = async(req, res) => {
     const issueId = req.query.issue;
-    const sprints = await SprintModel.find({ project: issue });
+    const sprints = await SprintModel.find({ issue: issueId });
     res.status(StatusCodes.OK).json({ sprints });
 };
 
