@@ -21,6 +21,16 @@ const materialSchema = new mongoose.Schema({
         type: Number, 
         required: true, 
     },
+    assigned: { 
+        type: Number, 
+        required: true,
+        default: 0, 
+    },
+    used: { 
+        type: Number, 
+        required: true,
+        default: 0, 
+    },
     measurementUnit: { 
         type: String, 
         required: true,
@@ -52,9 +62,5 @@ const materialSchema = new mongoose.Schema({
         default: Date.now() 
     }
 }) 
-
-// materialSchema.pre('save', async function() {
-//     this.totalPrice = this.quantity * this.unitPrice;
-// })
 
 module.exports = mongoose.model('material', materialSchema);

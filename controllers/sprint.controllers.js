@@ -2,6 +2,7 @@ const SprintModel = require('../models/sprint.model');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors/index');
 const asyncWrapper = require('../middleware/async');
+const materialModel = require('../models/material.model');
 
 const add = asyncWrapper(async (req, res) => {
     const existingSprints = await SprintModel.find({});
@@ -51,8 +52,24 @@ const remove = async(req, res) => {
 
 const edit = async(req, res) => {
     const sprintId = req.query.id;
-    // Join request before updating
-    const request = await SprintModel.findByIdAndUpdate({ _id: sprintId}, req.body);
+    var updatedSprint = req.body;
+    
+    var existingSprint = await SprintModel.findById(sprintId);
+    // Adding materials
+    if (req.body.material) {
+        // Making sure that a person does not assign materials that are not present.
+        const choosenMaterials = await materialModel.findById(material.id);
+
+        if (existingSprint.materials.length ===0) {
+            existingSprint.materials = [req.body.material];
+        } else if (existingSprint.materials.length > 0){
+            var existingMaterials = existingSprint.materials;
+            existingMaterials.push(req.body.material);
+        }
+        updatedSprint = existingSprint;
+    }
+
+    const request = await SprintModel.findByIdAndUpdate({ _id: sprintId }, updatedSprint);
     const updatedsprint = await SprintModel.findById(request._id);
 
     if (!updatedsprint) {
