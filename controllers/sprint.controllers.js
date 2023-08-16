@@ -52,21 +52,45 @@ const remove = async(req, res) => {
 
 const edit = async(req, res) => {
     const sprintId = req.query.id;
-    var updatedSprint = req.body;
+    var updatedSprint = req.body; 
     
     var existingSprint = await SprintModel.findById(sprintId);
+    
     // Adding materials
-    if (req.body.material) {
+    if (req.body.material && req.body.material.used === 0 && req.body.material.quantity > 0) {
+    
         // Making sure that a person does not assign materials that are not present.
-        const choosenMaterials = await materialModel.findById(material.id);
+        const choosenMaterial = await materialModel.findById(req.body.material.id);
 
-        if (existingSprint.materials.length ===0) {
-            existingSprint.materials = [req.body.material];
-        } else if (existingSprint.materials.length > 0){
-            var existingMaterials = existingSprint.materials;
-            existingMaterials.push(req.body.material);
+        if (req.body.material.quantity > choosenMaterial.quantity) {
+            throw new BadRequestError('Trying to allocate more than the available resource quantity')
+        } else {
+            // IF THE CHOOSEN QUANTITY IS GOOD
+            if (existingSprint.materials.length ===0) {
+                existingSprint.materials = [req.body.material];
+            } else if (existingSprint.materials.length > 0){
+                var existingMaterials = existingSprint.materials;
+                existingMaterials.push(req.body.material);
+            }
+            updatedSprint = existingSprint;
         }
+    }
+
+    // Updating materials
+    if (req.body.material && req.body.material.used > 0) {
+        
+        const choosenMaterial = await materialModel.findById(req.body.material.id);
+        
+        existingSprint.materials.forEach((material, index) => {
+            if (req.body.material.id === material.id && req.body.material.used > choosenMaterial.assigned) {
+                throw new BadRequestError('Used materials can not be greater than assigned materials')
+            } else if (req.body.material.id === material.id && req.body.material.used <= choosenMaterial.assigned) {
+                material.used = req.body.material.used;
+                material.quantity = req.body.material.quantity;
+            }
+        });
         updatedSprint = existingSprint;
+        console.log(updatedSprint.materials);
     }
 
     const request = await SprintModel.findByIdAndUpdate({ _id: sprintId }, updatedSprint);

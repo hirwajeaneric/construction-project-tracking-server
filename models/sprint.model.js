@@ -64,6 +64,10 @@ const sprintSchema = new mongoose.Schema({
             used: {
                 type: Number,
                 required: false,
+            },
+            date: {
+                type: Date, 
+                required: false
             }
         }
     ]
