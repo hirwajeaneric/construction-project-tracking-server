@@ -1,6 +1,7 @@
 const IssueModel = require('../models/issue.model');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors/index');
+const projectModel = require('../models/project.model');
 
 const add = async (req, res) => {
     const issue = await IssueModel.create(req.body);
@@ -40,12 +41,43 @@ const remove = async(req, res) => {
 
 const edit = async(req, res) => {
     const issueId = req.query.id;
-    // Join request before updating
+    // var toBeUpdatedIssue = req.body;
+    var projectOfThisIssue = req.body.project; 
+    
+    var projectIssues = [];
+    var numberOfAllIssues = 0;
+    var numberOfCompletedIssues = 0;
+    var projectProgress = 0;
+    var updatedProject = {};
+
+    // 1. Fetch previous issue 
+    var previousIssue = await IssueModel.findById(issueId);
+
+    // 2. Normal issue update
     const request = await IssueModel.findByIdAndUpdate({ _id: issueId}, req.body);
     const updatedissue = await IssueModel.findById(request._id);
 
-    if (!updatedissue) {
-        throw new NotFoundError(`Join request not found!`);
+    // Update the project progress as well.
+    // Updating the project progress when ever an issue's progress is updated.
+        
+    // 3. Compare the previous issue progress to the updated one
+    if (updatedissue.progress !== previousIssue.progress) {
+        
+        // 1. Fetch all issues of the same project 
+        projectIssues = await IssueModel.find({ project: projectOfThisIssue});
+        numberOfAllIssues = projectIssues.length;
+        
+        // 2. Get the number of completed issues 
+        let completedIssues = projectIssues.filter(element => element.progress === 'Completed')
+        numberOfCompletedIssues = completedIssues.length;
+        
+        // 3. Make a calculation of progress according to the given numbers
+        projectProgress = numberOfCompletedIssues * 100 / numberOfAllIssues;
+        updatedProject = await projectModel.findByIdAndUpdate({ _id: projectOfThisIssue }, { progress: projectProgress });
+    }
+
+    if (!updateProject) {
+        throw new BadRequestError('Failed to update project progress!');
     }
 
     res.status(StatusCodes.OK).json({ message: 'Updated', issue: updatedissue})
