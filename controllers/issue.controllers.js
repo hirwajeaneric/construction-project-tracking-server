@@ -41,8 +41,6 @@ const remove = async(req, res) => {
 
 const edit = async(req, res) => {
     const issueId = req.query.id;
-    // var toBeUpdatedIssue = req.body;
-    var projectOfThisIssue = req.body.project; 
     
     var projectIssues = [];
     var numberOfAllIssues = 0;
@@ -52,6 +50,8 @@ const edit = async(req, res) => {
 
     // 1. Fetch previous issue 
     var previousIssue = await IssueModel.findById(issueId);
+
+    var projectOfThisIssue = previousIssue.project; 
 
     // 2. Normal issue update
     const request = await IssueModel.findByIdAndUpdate({ _id: issueId}, req.body);
@@ -76,7 +76,7 @@ const edit = async(req, res) => {
         updatedProject = await projectModel.findByIdAndUpdate({ _id: projectOfThisIssue }, { progress: projectProgress });
     }
 
-    if (!updateProject) {
+    if (!updatedProject) {
         throw new BadRequestError('Failed to update project progress!');
     }
 
