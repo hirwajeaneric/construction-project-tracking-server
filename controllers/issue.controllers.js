@@ -23,7 +23,7 @@ const findById = async(req, res) => {
 };
 
 const findByProjectId = async(req, res) => {
-    const {project} = req.query;
+    const { project } = req.query;
     const issues = await IssueModel.find({ project: project });
     res.status(StatusCodes.OK).json({ issues });
 };
