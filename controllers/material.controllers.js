@@ -57,12 +57,26 @@ const findByProjectId = async(req, res) => {
 };
 
 const edit = async(req, res) => {
-    const material = req.body;
+    const materialToBeUpdated = req.body;
     const { id } = req.query;
-    
-    const updated = await MaterialModel.findByIdAndUpdate({ _id: id }, material);
-    const updatedMaterial = await MaterialModel.findById(updated._id);
 
+    const existingMaterial = await MaterialModel.findById(id);
+
+    if (materialToBeUpdated.assigned && materialToBeUpdated.assigned !== existingMaterial.assigned) {
+        materialToBeUpdated.assigned = existingMaterial.assigned+materialToBeUpdated.assigned;
+    } else {
+        delete materialToBeUpdated.assigned;
+    }
+
+    if (materialToBeUpdated.used && materialToBeUpdated.used !== existingMaterial.used) {
+        materialToBeUpdated.used = existingMaterial.used+materialToBeUpdated.used;
+    } else {
+        delete materialToBeUpdated.used;
+    }
+
+    const updated = await MaterialModel.findByIdAndUpdate({ _id: id }, materialToBeUpdated);
+
+    const updatedMaterial = await MaterialModel.findById(updated._id);
     res.status(StatusCodes.OK).json({ message: 'Updated', material: updatedMaterial })
 };
 

@@ -16,7 +16,7 @@ const sprintSchema = new mongoose.Schema({
     creationDate: {
         type: Date,
         required: true,
-        default: Date.now()
+        default: new Date().toISOString()
     },
     startDate: {
         type: Date,
@@ -44,7 +44,8 @@ const sprintSchema = new mongoose.Schema({
         enum: {
             values: ["Todo", "In Progress", "Completed"],
             message: '{VALUE} is not supported as a project type.'
-        }
+        },
+        default: "Todo"
     },
     materials: [
         {
@@ -59,6 +60,14 @@ const sprintSchema = new mongoose.Schema({
             quantity: {
                 type: Number,
                 required: false,
+            },
+            used: {
+                type: Number,
+                required: false,
+            },
+            date: {
+                type: Date, 
+                required: false
             }
         }
     ]
